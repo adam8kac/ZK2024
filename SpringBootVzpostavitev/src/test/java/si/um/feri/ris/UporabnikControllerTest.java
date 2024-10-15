@@ -61,5 +61,26 @@ public class UporabnikControllerTest {
     }
 
     //Donirali vec kot 3x in je SUM vec od 500
-    
+    @Test
+    @Transactional
+    public void pridobiTopDonatorje(){
+        Uporabnik uporabnik1 = new Uporabnik("uporabnisko_ime", "ime", "priimek");
+        uporabnikDao.save(uporabnik1);
+
+        Donacija d1 = new Donacija();
+        Donacija d2 = new Donacija();
+        Donacija d3 = new Donacija();
+
+        d1.setZnesekDonacije(100);
+        d2.setZnesekDonacije(500);
+        d3.setZnesekDonacije(100);
+
+        uporabnikController.dodajDonacijoUporabniku(uporabnik1.getId(), d1);
+        uporabnikController.dodajDonacijoUporabniku(uporabnik1.getId(), d2);
+        uporabnikController.dodajDonacijoUporabniku(uporabnik1.getId(), d3);
+
+        List<Uporabnik> topDonatorji = uporabnikController.pridobiTopDonatorje();
+
+        Assertions.assertEquals(uporabnik1.getUporabniskoIme(), topDonatorji.get(0).getUporabniskoIme());
+    }
 }
