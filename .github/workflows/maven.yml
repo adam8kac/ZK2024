@@ -1,11 +1,3 @@
-# This workflow will build a Java project with Maven, and cache/restore any dependencies to improve the workflow execution time
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-maven
-
-# This workflow uses actions that are not certified by GitHub.
-# They are provided by a third-party and are governed by
-# separate terms of service, privacy policy, and support
-# documentation.
-
 name: Java CI with Maven
 
 on:
@@ -27,8 +19,30 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
         cache: maven
+
     - name: Build with Maven
       run: mvn -B package --file ./SpringBootVzpostavitev/pom.xml
+      
+    - name: Run tests with Spring properties
+      run: mvn test
+      env:
+        SPRING_DATASOURCE_URL: jdbc:mysql://localhost:3306/auxilium
+        SPRING_DATASOURCE_USERNAME: root
+        SPRING_DATASOURCE_PASSWORD: ""   # Empty password
+        SPRING_DATASOURCE_DRIVER_CLASS_NAME: com.mysql.cj.jdbc.Driver
+        SPRING_JPA_SHOW_SQL: "true"
+        SPRING_JPA_GENERATE_DDL: "true"
+        SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.MySQLDialect
+        SERVER_PORT: 8080
+        SERVER_SERVLET_CONTEXT_PATH: /api/v1
+
+        SPRING_MAIL_HOST: smtp.gmail.com
+        SPRING_MAIL_PORT: 587
+        SPRING_MAIL_USERNAME: ${{ secrets.MAIL_USERNAME }}        # Add in GitHub Secrets
+        SPRING_MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}        # Add in GitHub Secrets
+        SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH: "true"
+        SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE: "true"
+        SPRING_MAIL_PROPERTIES_MAIL_DEBUG: "true"
 
     # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive
     - name: Update dependency graph
