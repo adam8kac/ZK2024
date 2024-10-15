@@ -10,6 +10,20 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    services:
+      mysql:
+        image: mysql:8.0
+        ports:
+          - 3306:3306
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: auxilium
+        options: >-
+          --health-cmd="mysqladmin ping --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+
     steps:
     - uses: actions/checkout@v4
 
@@ -20,19 +34,33 @@ jobs:
         distribution: 'temurin'
         cache: maven
 
+    - name: Wait for MySQL to be ready
+      run: |
+        for i in {30..0}; do
+          if mysqladmin ping -h "localhost" --silent; then
+            break
+          fi
+          echo 'Waiting for MySQL...'
+          sleep 1
+        done
+        if [ "$i" = 0 ]; then
+          echo 'MySQL did not start in time' >&2
+          exit 1
+        fi
+
     - name: Build with Maven
       run: mvn -B package --file ./SpringBootVzpostavitev/pom.xml
       
-    - name: Run tests with H2 database
+    - name: Run tests with MySQL database
       run: mvn test
       env:
-        SPRING_DATASOURCE_URL: jdbc:h2:mem:testdb
-        SPRING_DATASOURCE_USERNAME: sa
-        SPRING_DATASOURCE_PASSWORD: ""
-        SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.h2.Driver
+        SPRING_DATASOURCE_URL: jdbc:mysql://localhost:3306/auxilium
+        SPRING_DATASOURCE_USERNAME: root
+        SPRING_DATASOURCE_PASSWORD: root
+        SPRING_DATASOURCE_DRIVER_CLASS_NAME: com.mysql.cj.jdbc.Driver
         SPRING_JPA_SHOW_SQL: "true"
         SPRING_JPA_GENERATE_DDL: "true"
-        SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.H2Dialect
+        SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.MySQLDialect
         SERVER_PORT: 8080
         SERVER_SERVLET_CONTEXT_PATH: /api/v1
 
