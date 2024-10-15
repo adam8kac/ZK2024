@@ -8,11 +8,11 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v4
+
     - name: Set up JDK 17
       uses: actions/setup-java@v4
       with:
@@ -23,16 +23,16 @@ jobs:
     - name: Build with Maven
       run: mvn -B package --file ./SpringBootVzpostavitev/pom.xml
       
-    - name: Run tests with Spring properties
+    - name: Run tests with H2 database
       run: mvn test
       env:
-        SPRING_DATASOURCE_URL: jdbc:mysql://localhost:3306/auxilium
-        SPRING_DATASOURCE_USERNAME: root
-        SPRING_DATASOURCE_PASSWORD: ""   # Empty password
-        SPRING_DATASOURCE_DRIVER_CLASS_NAME: com.mysql.cj.jdbc.Driver
+        SPRING_DATASOURCE_URL: jdbc:h2:mem:testdb
+        SPRING_DATASOURCE_USERNAME: sa
+        SPRING_DATASOURCE_PASSWORD: ""
+        SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.h2.Driver
         SPRING_JPA_SHOW_SQL: "true"
         SPRING_JPA_GENERATE_DDL: "true"
-        SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.MySQLDialect
+        SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.H2Dialect
         SERVER_PORT: 8080
         SERVER_SERVLET_CONTEXT_PATH: /api/v1
 
@@ -44,6 +44,5 @@ jobs:
         SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE: "true"
         SPRING_MAIL_PROPERTIES_MAIL_DEBUG: "true"
 
-    # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive
     - name: Update dependency graph
       uses: advanced-security/maven-dependency-submission-action@571e99aab1055c2e71a1e2309b9691de18d6b7d6
