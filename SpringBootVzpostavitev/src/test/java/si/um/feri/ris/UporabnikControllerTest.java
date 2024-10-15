@@ -16,6 +16,7 @@ import java.util.List;
 import jakarta.transaction.Transactional;
 
 @SpringBootTest
+@Transactional
 public class UporabnikControllerTest {
 
     @Autowired
@@ -33,8 +34,7 @@ public class UporabnikControllerTest {
         donacijaDao.deleteAll();
     }
 
-    @Test
-    @Transactional //zaradi lazyLoading - da se vse commita in potem preveri
+    @Test//zaradi lazyLoading - da se vse commita in potem preveri
     public void getVeckratneDonatorje() {
         Uporabnik uporabnik1 = new Uporabnik("uporabnisko_ime", "ime", "priimek");
         uporabnikDao.save(uporabnik1);
