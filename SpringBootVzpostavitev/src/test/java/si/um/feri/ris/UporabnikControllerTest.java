@@ -5,6 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import si.um.feri.ris.controllers.UporabnikController;
 import si.um.feri.ris.models.Donacija;
 import si.um.feri.ris.models.Uporabnik;
@@ -59,5 +60,6 @@ public class UporabnikControllerTest {
         Assertions.assertEquals(uporabnik1.getIme(), veckratniDonatorji.get(0).getUporabniskoIme()); //v bazi je uporabnisko ime kot ime
     }
 
-
+    //Donirali vec kot 3x in je SUM vec od 500
+    
 }
