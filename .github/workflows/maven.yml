@@ -16,13 +16,14 @@ jobs:
         ports:
           - 3306:3306
         env:
-          MYSQL_ROOT_PASSWORD: ""
+          MYSQL_ALLOW_EMPTY_PASSWORD: "yes"  # Dovoli prazno geslo
+          MYSQL_ROOT_PASSWORD: ""             # Prazno geslo
           MYSQL_DATABASE: auxilium
         options: >-
           --health-cmd="mysqladmin ping --silent"
           --health-interval=10s
           --health-timeout=5s
-          --health-retries=3
+          --health-retries=10  # Povečano število poskusov
 
     steps:
     - uses: actions/checkout@v4
@@ -36,12 +37,12 @@ jobs:
 
     - name: Wait for MySQL to be ready
       run: |
-        for i in {30..0}; do
+        for i in {60..0}; do
           if mysqladmin ping -h "localhost" --silent; then
             break
           fi
           echo 'Waiting for MySQL...'
-          sleep 1
+          sleep 2
         done
         if [ "$i" = 0 ]; then
           echo 'MySQL did not start in time' >&2
@@ -56,7 +57,7 @@ jobs:
       env:
         SPRING_DATASOURCE_URL: jdbc:mysql://localhost:3306/auxilium
         SPRING_DATASOURCE_USERNAME: root
-        SPRING_DATASOURCE_PASSWORD: root
+        SPRING_DATASOURCE_PASSWORD: ""   # Prazno geslo za root
         SPRING_DATASOURCE_DRIVER_CLASS_NAME: com.mysql.cj.jdbc.Driver
         SPRING_JPA_SHOW_SQL: "true"
         SPRING_JPA_GENERATE_DDL: "true"
